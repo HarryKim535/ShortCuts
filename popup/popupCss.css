@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 3px;
+    width: 250px;
+    background-color: #4c5ed6;
+    font-family: Arial, Helvetica, sans-serif;
+}
+div {
+    font-size: 15px;
+    color: #fffde8;
+    margin: 5px;
+}
+.title {
+    color: #ffe367;
+    font-size: 25px;
+    font-weight: bold;
+    padding-left: 10px;
+}
+#gear {
+    position: fixed;
+    width: 20px;
+    right: 6px;
+}
+#info {
+    margin-bottom: 15px;
+}
+#textinput {
+    border: 0px;
+}
+input[type="button"] {
+    border: 0px;
+}
