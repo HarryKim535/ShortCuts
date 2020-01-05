@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "ShortCuts",
     "version": "0.1",
-    "description": "Create ShortCuts that Never Bother You Again!\nunder development\n50%",
+    "description": "Create ShortCuts that Never Bother You Again! under development 40%",
     "permissions": ["storage", "bookmarks", "tabs"],
     "commands": {
         "openBM0": {
