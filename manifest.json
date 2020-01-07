@@ -3,7 +3,7 @@
     "name": "ShortCuts",
     "version": "0.1",
     "description": "Create ShortCuts that Never Bother You Again! under development 40%",
-    "permissions": ["storage", "bookmarks", "tabs"],
+    "permissions": ["storage", "bookmarks", "tabs", "input", "activeTab"],
     "commands": {
         "openBM0": {
             "suggested_key": {
@@ -33,6 +33,11 @@
     "background": {
         "scripts": ["background.js"],
         "persistent": false
+    },
+    "content_scripts": {
+        "matches": ["*"],
+        "run_at": "document_start",
+        "js": ["contentScript.js"]
     },
     "browser_action": {
         "default_popup": "popup/popup.html",
