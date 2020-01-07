@@ -2,43 +2,89 @@
     "manifest_version": 2,
     "name": "ShortCuts",
     "version": "0.1",
-    "description": "Create ShortCuts that Never Bother You Again! under development 40%",
-    "permissions": ["storage", "bookmarks", "tabs", "input", "activeTab"],
+    "description": "Create ShortCuts that Never Bother You Again! under development 60%",
+    "permissions": ["storage", "bookmarks", "tabs"],
     "commands": {
-        "openBM0": {
+        "openBM_0": {
             "suggested_key": {
-                "windows": "Alt+1"
+                "default": "Alt+1"
             },
-            "description": "Open your first Bookmark"
+            "description": "1st Bookmark"
         },
-        "openBM1": {
+        "openBM_1": {
             "suggested_key": {
-                "windows": "Alt+2"
+                "default": "Alt+2"
             },
-            "description": "Open your second Bookmark"
+            "description": "2nd Bookmark"
         },
-        "openBM2": {
+        "openBM_2": {
             "suggested_key": {
-                "windows": "Alt+3"
+                "default": "Alt+3"
             },
-            "description": "Open your third Bookmark"
+            "description": "3rd Bookmark"
         },
-        "openBM3": {
+        "openBM_3": {
             "suggested_key": {
-                "windows": "Alt+4"
+                "default": "Alt+4"
             },
-            "description": "Open your forth Bookmark"
+            "description": "4th Bookmark"
+        },
+        "openBM_4": {
+            "description": "5th Bookmark"
+        },
+        "openBM_5": {
+            "description": "6th Bookmark"
+        },
+        "openBM_6": {
+            "description": "7th Bookmark"
+        },
+        "openBM_7": {
+            "description": "8th Bookmark"
+        },
+        "openBM_8": {
+            "description": "9th Bookmark"
+        },
+        "openBM_9": {
+            "description": "10th Bookmark"
+        },
+        "openURL_0": {
+            "description": "additional URL"
+        },
+        "openURL_1": {
+            "description": "additional URL"
+        },
+        "openURL_2": {
+            "description": "additional URL"
+        },
+        "openURL_3": {
+            "description": "additional URL"
+        },
+        "openURL_4": {
+            "description": "additional URL"
+        },
+        "openURL_5": {
+            "description": "additional URL"
+        },
+        "openURL_6": {
+            "description": "additional URL"
+        },
+        "openURL_7": {
+            "description": "additional URL"
+        },
+        "openURL_8": {
+            "description": "additional URL"
+        },
+        "openURL_9": {
+            "description": "additional URL"
         }
+
+
     },
     "background": {
         "scripts": ["background.js"],
         "persistent": false
     },
-    "content_scripts": {
-        "matches": ["*"],
-        "run_at": "document_start",
-        "js": ["contentScript.js"]
-    },
+    "options_page": "options/options.html",
     "browser_action": {
         "default_popup": "popup/popup.html",
         "default_title": "ShortCuts\nLink and Popup Manager",

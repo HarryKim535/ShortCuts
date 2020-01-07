@@ -16,7 +16,7 @@ div {
     font-weight: bold;
     padding-left: 10px;
 }
-#gear {
+.icon {
     position: fixed;
     width: 20px;
     right: 6px;

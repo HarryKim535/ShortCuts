@@ -1,11 +1,12 @@
 //Add Listener every time popup.html pops up
 
 window.onload = function () {
-    placeUrl (true);
+    placeUrl ();
     initialize ();
-    document.getElementById('submit').onclick = addUrl;
-    document.getElementById('init').onclick = togInit;
-    document.getElementById('reset').onclick = clear;
+    this.document.getElementById('gear').onclick = goOptions;
+    this.document.getElementById('submit').onclick = addUrl;
+    this.document.getElementById('init').onclick = togInit;
+    this.document.getElementById('reset').onclick = clear;
 }
 
 function initialize () {
@@ -16,6 +17,12 @@ function initialize () {
     });
 }
 
+function goOptions () {
+    chrome.storage.local.get(['config'], function (reg) {
+        chrome.windows.create(reg.config.optAttr);
+    })
+}
+
 //Store URL object when Save botton got pressed
 
 function addUrl (_, urlInput) {
@@ -23,13 +30,13 @@ function addUrl (_, urlInput) {
     chrome.storage.local.get(['config', 'urlInfo'], function (reg) {
         if (!urlInput) {
             var re = new RegExp(reg.config.urlForm);
-            var url = document.getElementById('textInput').value;
+            var txt = document.getElementById('textInput').value;
             var plholder = document.getElementById('textInput').placeholder;
-            var urlEval = url.match(re);
-            if (url === "") {
+            var urlEval = txt.match(re);
+            if (txt === "") {
                 if (plholder === "") return;
                 chrome.tabs.query(reg.config.urlAttr, function (tabs) {
-                    urlEval = tabs[0].url.match(re)
+                    urlEval = tabs[0].url.match(re);
                     addUrl(_, urlEval);
                     return;
                 });
@@ -38,7 +45,6 @@ function addUrl (_, urlInput) {
         }
         else {
             var urlEval = urlInput;
-            console.log(urlEval);
         }
         if (urlEval === null) {
             chrome.runtime.sendMessage('notUrl');
@@ -46,13 +52,9 @@ function addUrl (_, urlInput) {
             placeUrl ();
             return;
         }
-        if (urlEval[2]) urlEval[0] = urlEval[3];
-        if (!urlEval[4]&&!urlEval[5]&&urlEval[6]&&!urlEval[7]) urlEval[0] += '/';
-        console.log(urlEval);
-
         var vOpen = document.getElementById('select').value;
 //Append new URL object to Array
-        reg.urlInfo.urls[reg.urlInfo.urls.length] = {url: urlEval[0], open: vOpen, openIn: reg.config.openUrlIn};
+        reg.urlInfo.urls[reg.urlInfo.urls.length] = {url: urlEval, open: vOpen, openIn: reg.config.openUrlIn, key: reg.config.urlKey};
         chrome.storage.local.set({urlInfo: reg.urlInfo}, function () {
             chrome.runtime.sendMessage('urlAdded');
         });
@@ -63,7 +65,7 @@ function addUrl (_, urlInput) {
 //Set Placeholder
 
 function placeUrl () {
-    chrome.storage.local.get(['config', 'urlInfo'], function (reg) {
+    chrome.storage.local.get(['config'], function (reg) {
         var re = new RegExp(reg.config.urlForm)
         chrome.tabs.query(reg.config.urlAttr, function (tabs) {
             var urlEval = tabs[0].url.match(re)
