@@ -54,7 +54,7 @@ function addUrl (_, urlInput) {
         }
         var vOpen = document.getElementById('select').value;
 //Append new URL object to Array
-        reg.urlInfo.urls[reg.urlInfo.urls.length] = {url: urlEval, open: vOpen, openIn: reg.config.openUrlIn, key: reg.config.urlKey};
+        reg.urlInfo.urls[reg.urlInfo.urls.length] = {url: urlEval, open: vOpen, openIn: reg.config.openUrlIn, open: reg.config.openUrl, key: reg.config.urlKey};
         chrome.storage.local.set({urlInfo: reg.urlInfo}, function () {
             chrome.runtime.sendMessage('urlAdded');
         });

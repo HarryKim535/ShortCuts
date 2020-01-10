@@ -1,11 +1,11 @@
 //Ge bookmarkbar information
 
 function getBBInfo () {
-    chrome.bookmarks.getChildren('1', function (bookmarks) {
-        chrome.storage.local.get(['bbInfo', 'config'], function (reg) {
+    chrome.bookmarks.getChildren('1', bookmarks => {
+        chrome.storage.local.get(['bbInfo', 'config'], reg => {
             var re = RegExp(reg.config.urlForm)
             for (i in bookmarks) {
-                reg.bbInfo.urls[i] = {url: bookmarks[i].url.match(re), openIn: reg.config.openBBIn, key: i};
+                reg.bbInfo.urls[i] = {url: bookmarks[i].url.match(re), openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
             }
             chrome.storage.local.set({bbInfo: reg.bbInfo}, function () {
                 console.log(reg.bbInfo);
@@ -17,13 +17,14 @@ function getBBInfo () {
 //Open websites with keyboard shortcut
 
 function setShortcuts (command) {
-    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], function (reg) {
+    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
         var re = /(BM|URL)_(\d)/;
-        var input = command.match(re)
+        var input = command.match(re);
         var g = input[1];
         var i = input[2];
         if (g =='BM') {
             reg.config.tabAttr.url = reg.bbInfo.urls[i].url[0];
+            reg.config.tabAttr.active = reg.bbInfo.urls[i].isActive;
             console.log(reg.config.tabAttr.url);
             chrome.tabs.create(reg.config.tabAttr);
         }
@@ -31,6 +32,7 @@ function setShortcuts (command) {
             for (item in reg.urlInfo.urls) {
                 if (item.key == i) {
                     reg.config.tabAttr.url = item.url[0];
+                    reg.config.tabAttr.active = item.active;
                     chrome.tabs.create(reg.config.tabAttr);
                 }
             }
@@ -42,12 +44,12 @@ function setShortcuts (command) {
 
 function checkMsg (msg) {
     if (msg == 'urlAdded') {
-        chrome.storage.local.get(['urlInfo'], function (reg) {
+        chrome.storage.local.get(['urlInfo'], reg => {
             console.log(reg.urlInfo.urls);
         });
     }
     else if (msg == 'cfClear') {
-        chrome.storage.local.get(['config'], function (reg) {
+        chrome.storage.local.get(['config'], reg => {
             if (reg.config.init) cfClear(true)
             else cfClear(false);
         })
@@ -65,7 +67,7 @@ function checkMsg (msg) {
   Cannnot guerantee stability*/
 
 function watchTabs (tab) {
-    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], function (reg) {
+    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
         /*chrome.windows.getAll(function (windows) {
             if (windows.length > reg.config.maxWin) {
                 alert('Generating New Window Aborted\nMaxinum Number of Windows Cannot Surpass ' + reg.config.maxWin);
@@ -76,7 +78,7 @@ function watchTabs (tab) {
             reg.config.winAttr.tabId = tab.id;
             var re = new RegExp(reg.config.urlForm);
             var urlEval = tab.pendingUrl.match(re);
-            if (reg.bbInfo.urls){
+            if (reg.bbInfo.urls) {
                 for (i in reg.bbInfo.urls) {
                     newWindow(reg.bbInfo.urls[i], urlEval[0], reg.config);
                 }
@@ -91,15 +93,19 @@ function watchTabs (tab) {
 }
 
 function newWindow(item, urlEval, config) {
-    if (urlEval == item.url[0]&&item.openIn == 'newWin') {
+    if (urlEval == item.url[0]) {
         console.log('passed')
-        if (config.winAttr.tabId) {
-            chrome.windows.create(config.winAttr, function () {
-                console.log('created ' + config.winAttr.tabId);
-                return;
-            });
+        if (item.openIn == 'newWin') {
+            if (config.winAttr.tabId) {
+                chrome.windows.create(config.winAttr, function () {
+                    console.log('created ' + config.winAttr.tabId);
+                    return;
+                });
+            }
         }
-        
+        else if (item.isActive) {
+            chrome.tabs.update(config.winAttr.tabId, {active: true});
+        }
     }
 }
 
@@ -113,7 +119,8 @@ function newWindow(item, urlEval, config) {
    "script-src 'self' blob: filesystem:*/
 
 function setListeners () {
-    chrome.runtime.onInstalled.addListener(getBBInfo);
+    chrome.runtime.onInstalled.addListener(initialize);
+    chrome.runtime.onStartup.addListener(getBBInfo);
     chrome.runtime.onMessage.addListener(checkMsg);
     chrome.commands.onCommand.addListener(setShortcuts);
     chrome.bookmarks.onCreated.addListener(getBBInfo);
@@ -128,33 +135,37 @@ function setListeners () {
 
 //Define storage if undefined
 
-function initialize () {
-    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo', 'defInfo'], function (reg) {
-        if (!reg.config) {
-            cfClear (false);
-            console.log('config initialized');
-        }
-        else if(reg.config.init) {
-            cfClear (true);
-            console.log('config initialized by init');
-        } 
-        if (!reg.urlInfo) {
-            urlClear ();
-            console.log('url initialized');
-        }
-        else if(reg.urlInfo.init) {
-            urlClear ();
-            console.log('url initialized');
-        } 
-        if (!reg.bbInfo) {
-            bbClear ();
-            console.log('bookmarks initialized')
-        }
-        else if(reg.bbInfo.init) {
-            bbClear ();
-            console.log('bookmarks initialized')
-        }
-    });
+function initialize (details) {
+    //for real use
+    //if (details.reason == 'install') {
+        chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
+            //for developing purpose only
+            if (!reg.config) {
+                cfClear (false);
+                console.log('config initialized');
+            }
+            else if(reg.config.init) { 
+                cfClear (true);
+                console.log('config initialized by init');
+            }
+            if (!reg.bbInfo) {
+                bbClear ();
+                console.log('bookmarks initialized')
+            }
+            else if(reg.bbInfo.init) {
+                bbClear ();
+                console.log('bookmarks initialized')
+            }
+            if (!reg.urlInfo) {
+                urlClear ();
+                console.log('url initialized');
+            }
+            else if(reg.urlInfo.init) {
+                urlClear ();
+                console.log('url initialized');
+            }
+        });
+    //}
 }
 
 //Reset configurations
@@ -189,7 +200,8 @@ function cfClear (bool) {
             currentWindow: true
         },
         tabAttr: {
-            url: null
+            url: null,
+            active: true
         },
         winAttr: {
             tabId: 0,
@@ -197,17 +209,34 @@ function cfClear (bool) {
         },
         optAttr: {
             url: 'options/options.html',
-            left: 610,
+            left: 593,
             top: 100,
-            width: 700,
+            width: 734,
             height: 500,
             type: 'panel',
             setSelfAsOpener: true
         },
+    //value name self equals the parent
+        open: {
+            value : ['only', 'every'],
+            detail: ['related'],
+            str: ['Only one URL', 'Every Sub URL'],
+            str_detail: ['Every related URL']
+        },
+        openIn: {
+            value: ['newTab', 'newWin'],
+            detail: ['newPop', 'newFull'],
+            str: ['New Tab', 'New Window'],
+            str_detail: ['New Popup', 'New Full Screen']
+        },
+        openBB: 'only',
+        openUrl: 'only',
         openBBIn: 'newTab',
         openUrlIn: 'newWin',
-        urlKey: -1,
         openFileIn: 'newWin',
+        urlKey: -1,
+        optDetails: true,
+        optAdvanced: false,
         maxWin: 5,
         init: false
     }
@@ -239,6 +268,7 @@ function bbClear () {
     chrome.storage.local.set({
         bbInfo: {
             urls: [],
+            curUrl: null
         }
     },
     function () {
@@ -247,14 +277,15 @@ function bbClear () {
     });
 }
 
+//for developing purpose only
+
 function showStored (name) {
-    chrome.storage.local.get([name], function (reg) {
+    chrome.storage.local.get([name], reg => {
         console.log(reg);
     });
 }
 
 //Main
-var pTabId = 0;
 
 initialize ();
 
@@ -265,9 +296,9 @@ setListeners ();
 //+Simpler version of bookmarkbar shortcuts
 
 function goDirect () {
-    chrome.commands.onCommand.addListener(function (command) {
+    chrome.commands.onCommand.addListener(command => {
         var index = command[command.length-1];
-        chrome.bookmarks.getChildren('1', function (bookmarks) {
+        chrome.bookmarks.getChildren('1', bookmarks => {
             console.log(bookmarks);
             chrome.tabs.create({url: bookmarks[index].url});
         });

@@ -1,15 +1,70 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel = "stylesheet" type = "text/css" href = "optionsCss.css">
-        <script src = "optionsJs.js"></script>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="optionsCss.css">
+        <script src="optionsJs.js"></script>
     </head>
     <body>
-        <div id = "topBar">
-            <span class = "logo">Sc</span>
-        </div>
         <div>
-            
+            <div class="topBar">
+            </div>
+            <div class="title">
+                <span>Settings</span>
+            </div>
+            <div class="title">
+                <span>Bookmarks</span>
+            </div>
+            <div class="main">
+                <div class="innerMain">
+                    <div id="bookmarks" class="object">
+                        <div id="bookmarksHeader" class="objHeader">
+                            <div class="domain">
+                                <span class="selecHeader">Bookmarks Bar</span>
+                                <input id="bbInfo" class="expand" type="checkbox">
+                            </div>
+                        </div>
+                        <div id="bookmarksInner" class="innerObj">
+                            <div class="settings">
+                                <div class="sepLine"></div>
+                                <div class="setting">
+                                    <span class="selecHeader">Open in a</span>
+                                    <select id="openBBIn" class="selec">
+                                    </select>
+                                </div>
+                                <div class="setting">
+                                    <span class="selecHeader">Open</span>
+                                    <select id="openBB" class="selec">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="urls" class="object">
+                        <div id="urlsHeader" class="objHeader">
+                            <div class="domain">
+                                <span class="selecHeader">Registerd URLs</span>
+                                <input id="urlInfo" class="expand" type="checkbox">
+                            </div>
+                        </div>
+                        <div id="urlsInner" class="innerObj">
+                            <div class="settings">
+                                <div class="sepLine"></div>
+                                <div class="setting">
+                                    <span class="selecHeader">Open in a</span>
+                                    <select id="openUrlIn" class="selec">
+                                    </select>
+                                </div>
+                                <div class="setting">
+                                    <span class="selecHeader">Open</span>
+                                    <select id="openUrl" class="selec">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
