@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <title>Settings - ShortCuts</title>
         <link rel="stylesheet" type="text/css" href="optionsCss.css">
         <script src="optionsJs.js"></script>
     </head>
@@ -12,20 +13,74 @@
             <div class="title">
                 <span>Settings</span>
             </div>
+        </div>
+        <div>
             <div class="title">
-                <span>Bookmarks</span>
+                <span>General</span>
             </div>
-            <div class="main">
-                <div class="innerMain">
-                    <div id="bookmarks" class="object">
-                        <div id="bookmarksHeader" class="objHeader">
+            <div class="container">
+                <div class="innerContainer">
+                    <div class="object">
+                        <div class="objHeader">
                             <div class="domain">
+                                <span>Manage Shortcuts</span>
+                            </div>
+                            <div class="subDomain">
+                                <span>Recommended</span>
+                            </div>
+                        </div>
+                        <div class="innerObj">
+                            <div class="settings">
+                                <div class="sepLine"></div>
+                                <div class="setting">
+                                    <div id="openShortcuts">
+                                        <span>Chrome Key Settings</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings">
+                                <div class="sepLine"></div>
+                                <div class="setting">
+                                    <span class="selecHeader"># th Bookmark :</span><span>Alt + #</span>                             </div>
+                                <div class="setting">
+                                    <span class="selecHeader">additinal URL :</span><span>Ctrl + Shift + #</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="object">
+                        <div class="objHeader">
+                            <div class="domain">
+                                <span>Make every new tab Focused</span>
+                            </div>
+                        </div>
+                        <div class="innerObj">
+                            <div class="settings">
+                                <div class="sepLine"></div>
+                                <div class="setting">
+                                    <input id="activeTab" type="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="title">
+                <span>Manage URLs</span>
+            </div>
+            <div class="container">
+                <div class="innerContainer">
+                    <div id="bookmarks" class="object">
+                        <div class="objHeader">
+                            <div id="domainBB" class="domain">
                                 <span class="selecHeader">Bookmarks Bar</span>
                                 <input id="bbInfo" class="expand" type="checkbox">
                             </div>
                         </div>
-                        <div id="bookmarksInner" class="innerObj">
-                            <div class="settings">
+                        <div class="innerObj">
+                            <div id="domainBBInfo" class="settings">
                                 <div class="sepLine"></div>
                                 <div class="setting">
                                     <span class="selecHeader">Open in a</span>
@@ -41,14 +96,14 @@
                         </div>
                     </div>
                     <div id="urls" class="object">
-                        <div id="urlsHeader" class="objHeader">
-                            <div class="domain">
+                        <div class="objHeader">
+                            <div id="domainUrl" class="domain">
                                 <span class="selecHeader">Registerd URLs</span>
                                 <input id="urlInfo" class="expand" type="checkbox">
                             </div>
                         </div>
-                        <div id="urlsInner" class="innerObj">
-                            <div class="settings">
+                        <div class="innerObj">
+                            <div id="domainUrlInfo" class="settings">
                                 <div class="sepLine"></div>
                                 <div class="setting">
                                     <span class="selecHeader">Open in a</span>

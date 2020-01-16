@@ -1,14 +1,14 @@
 //Ge bookmarkbar information
 
 function getBBInfo () {
-    chrome.bookmarks.getChildren('1', bookmarks => {
-        chrome.storage.local.get(['bbInfo', 'config'], reg => {
+    chrome.storage.local.get(['bbInfo', 'config'], reg => {
+        chrome.bookmarks.getChildren(reg.config.folderId, bookmarks => {
             var re = RegExp(reg.config.urlForm)
             for (i in bookmarks) {
                 reg.bbInfo.urls[i] = {url: bookmarks[i].url.match(re), openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
             }
             chrome.storage.local.set({bbInfo: reg.bbInfo}, function () {
-                console.log(reg.bbInfo);
+                chrome.runtime.sendMessage('edited');
             });
         });
     });
@@ -20,17 +20,17 @@ function setShortcuts (command) {
     chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
         var re = /(BM|URL)_(\d)/;
         var input = command.match(re);
-        var g = input[1];
-        var i = input[2];
-        if (g =='BM') {
-            reg.config.tabAttr.url = reg.bbInfo.urls[i].url[0];
-            reg.config.tabAttr.active = reg.bbInfo.urls[i].isActive;
+        var group = input[1];
+        var index = input[2];
+        if (group =='BM') {
+            reg.config.tabAttr.url = reg.bbInfo.urls[index].url[0];
+            reg.config.tabAttr.active = reg.bbInfo.urls[index].isActive;
             console.log(reg.config.tabAttr.url);
             chrome.tabs.create(reg.config.tabAttr);
         }
-        else if (g == 'URL') {
+        else if (group == 'URL') {
             for (item in reg.urlInfo.urls) {
-                if (item.key == i) {
+                if (item.key == index) {
                     reg.config.tabAttr.url = item.url[0];
                     reg.config.tabAttr.active = item.active;
                     chrome.tabs.create(reg.config.tabAttr);
@@ -68,14 +68,9 @@ function checkMsg (msg) {
 
 function watchTabs (tab) {
     chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
-        /*chrome.windows.getAll(function (windows) {
-            if (windows.length > reg.config.maxWin) {
-                alert('Generating New Window Aborted\nMaxinum Number of Windows Cannot Surpass ' + reg.config.maxWin);
-                return; //Abort
-            }
-            console.log(windows);*/
             console.log('read');
             reg.config.winAttr.tabId = tab.id;
+            if (reg.config.focusNewTab) chrome.tabs.update(tab.id, {active: true});
             var re = new RegExp(reg.config.urlForm);
             var urlEval = tab.pendingUrl.match(re);
             if (reg.bbInfo.urls) {
@@ -119,7 +114,6 @@ function newWindow(item, urlEval, config) {
    "script-src 'self' blob: filesystem:*/
 
 function setListeners () {
-    chrome.runtime.onInstalled.addListener(initialize);
     chrome.runtime.onStartup.addListener(getBBInfo);
     chrome.runtime.onMessage.addListener(checkMsg);
     chrome.commands.onCommand.addListener(setShortcuts);
@@ -209,11 +203,11 @@ function cfClear (bool) {
         },
         optAttr: {
             url: 'options/options.html',
-            left: 593,
+            left: 537,
             top: 100,
-            width: 734,
-            height: 500,
-            type: 'panel',
+            width: 845,
+            height: 540,
+            type: 'popup',
             setSelfAsOpener: true
         },
     //value name self equals the parent
@@ -234,10 +228,11 @@ function cfClear (bool) {
         openBBIn: 'newTab',
         openUrlIn: 'newWin',
         openFileIn: 'newWin',
+        focusNewTab: true,
+        folderId: '1',
         urlKey: -1,
         optDetails: true,
         optAdvanced: false,
-        maxWin: 5,
         init: false
     }
     if (bool) def.init = true;
@@ -298,8 +293,8 @@ setListeners ();
 function goDirect () {
     chrome.commands.onCommand.addListener(command => {
         var index = command[command.length-1];
-        chrome.bookmarks.getChildren('1', bookmarks => {
-            console.log(bookmarks);
+        var folderId = '1';
+        chrome.bookmarks.getChildren(folderId, bookmarks => {
             chrome.tabs.create({url: bookmarks[index].url});
         });
     });
