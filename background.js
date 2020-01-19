@@ -43,12 +43,7 @@ function setShortcuts (command) {
 //Check message and excute proper function
 
 function checkMsg (msg) {
-    if (msg == 'urlAdded') {
-        chrome.storage.local.get(['urlInfo'], reg => {
-            console.log(reg.urlInfo.urls);
-        });
-    }
-    else if (msg == 'cfClear') {
+    if (msg == 'cfClear') {
         chrome.storage.local.get(['config'], reg => {
             if (reg.config.init) cfClear(true)
             else cfClear(false);
@@ -56,8 +51,6 @@ function checkMsg (msg) {
     }
     else if (msg == 'bbClear') bbClear ();
     else if (msg == 'urlClear') urlClear ();
-    else if (msg == 'toggle') showStored('config');
-    else if (msg == 'notUrl') alert('Invalid URL');
     else console.log(msg);
 }
 
@@ -83,11 +76,11 @@ function watchTabs (tab) {
                     newWindow(reg.urlInfo.urls[i], urlEval[0], reg.config);
                 }
             }
-        //});
     });
 }
 
 function newWindow(item, urlEval, config) {
+    if (item.open == 'every') item.url[0] = item.url[1, 6].join('');
     if (urlEval == item.url[0]) {
         console.log('passed')
         if (item.openIn == 'newWin') {
@@ -129,8 +122,8 @@ function setListeners () {
 
 //Define storage if undefined
 
-function initialize (details) {
-    //for real use
+function initialize () {
+    //not working
     //if (details.reason == 'install') {
         chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
             //for developing purpose only
@@ -171,24 +164,25 @@ function cfClear (bool) {
                 1: http url
                 2: 'http[s]://'
                 3: 'www.'
-                4: host
-                5: '/'
-                6: path
-                7: '?'
-                8: '/$'
-                9: chrome url
-                10: chrome scheme
-                11: offline notion
-                12: host
-                13: '/'
-                14: path
-                15: '?'
-                16: '/$'
-                17: file url
-                18: ftp url
-                19: about url
+                4: prefix||host
+                5: host||suffix
+                6: '/'
+                7: path
+                8: '?'
+                9: '/$'
+                10: chrome url
+                11: chrome scheme
+                12: offline notion
+                13: host
+                14: '/'
+                15: path
+                16: '?'
+                17: '/$'
+                18: file url
+                19: ftp url
+                20: about url
             ]*/
-        urlForm: '((https?://)?(www[.])?([A-Za-z0-9%\\-_]+[.][A-Za-z0-9./%\\-_]+)(/)?([A-Za-z0-9./%\\-_]*)?([?])?(/$)?)|((chrome(-[a-z]+)?://)([a-z]+)(/)?([A-Za-z]*)([?])?(/$)?)|(file:///?\\S+)|(ftp://\\S+)|(about:\\w+)',
+        urlForm: '((https?://)?(www[.])?([A-Za-z0-9%\\-_]+[.])([A-Za-z0-9.%\\-_]+)(/)?([A-Za-z0-9./%\\-_]*)?([?])?(/$)?)|((chrome(-[a-z]+)?://)([a-z]+)(/)?([A-Za-z]*)([?])?(/$)?)|(file:///?\\S+)|(ftp://\\S+)|(about:\\w+)',
         urlAttr: {
             active: true,
             currentWindow: true
@@ -223,6 +217,10 @@ function cfClear (bool) {
             str: ['New Tab', 'New Window'],
             str_detail: ['New Popup', 'New Full Screen']
         },
+        menuList: {
+            value: ['delete'],
+            str: ['Delete']
+        },
         openBB: 'only',
         openUrl: 'only',
         openBBIn: 'newTab',
@@ -231,7 +229,7 @@ function cfClear (bool) {
         focusNewTab: true,
         folderId: '1',
         urlKey: -1,
-        optDetails: true,
+        optDetails: false,
         optAdvanced: false,
         init: false
     }
@@ -239,7 +237,7 @@ function cfClear (bool) {
     else def.init = false;
     chrome.storage.local.set({config: def},
     function () {
-        console.log('config cleared');
+        chrome.runtime.sendMessage('defCleared')
     });
 }
 
@@ -269,14 +267,6 @@ function bbClear () {
     function () {
         getBBInfo ();
         console.log('bookmark cleared');
-    });
-}
-
-//for developing purpose only
-
-function showStored (name) {
-    chrome.storage.local.get([name], reg => {
-        console.log(reg);
     });
 }
 

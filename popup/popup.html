@@ -7,35 +7,35 @@
         <title>Extension UI</title>
     </head>
     <body>
-        <div class="body">
-            <div>
-                <span class="title">ShortCuts</span>
-                <a herf="#" id="gear">
-                    <img class="icon" src="images/gear128.png" title="Settings" alt="Settings">
-                </a>
-            </div>
-            <hr/>
-            <div>
-                <form>
-                    <div id="info">
-                        <span>Custom Open Method</span>
+        <div>
+            <span class="title">ShortCuts</span>
+            <a herf="#" id="gear">
+                <img class="icon" src="images/gear128.png" title="Settings" alt="Settings">
+            </a>
+        </div>
+        <hr/>
+        <div>
+            <form>
+                <div id="info">
+                    <span>Open in a New Window</span>
+                </div>
+                <div id="url">
+                    <span class="selecHeader">URL :</span>
+                    <div class="float">
+                        <input id="textInput" type="text" autofocus>
                     </div>
-                    <div id="url">
-                        <span>URL : </span><input id="textInput" type="text" autofocus>
-                    </div>
-                    <div id="type">
-                        <select id="select">
-                            <option value="only">Only This</option>
-                            <option value="evrey">Every Subsites</option>
-                        </select>
-                    </div>
-                    <div>
+                </div>
+                <div id="type">
+                    <span class="selecHeader">Apply to</span>
+                    <select id="select">
+                        <option value="only">Only This</option>
+                        <option value="evrey">Every Subsites</option>
+                    </select>
+                    <div class="float">
                         <input id="submit" type="button" value="Save">
-                        <input id="reset" type="button" value="Reset">
-                        <input id="init" type="checkbox"><span>Init</span>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </body>
 </html>

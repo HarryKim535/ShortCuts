@@ -1,32 +1,54 @@
 body {
+    font-size: 15px;
     margin: 0;
-    padding: 3px;
-    width: 250px;
+    padding: .2em;
+    width: 17em;
     background-color: #4c5ed6;
     font-family: Arial, Helvetica, sans-serif;
 }
 div {
-    font-size: 15px;
     color: #fffde8;
-    margin: 5px;
+    margin: .4em;
+}
+span {
+    word-wrap: none;
 }
 .title {
     color: #ffe367;
-    font-size: 25px;
+    font-size: 1.7em;
     font-weight: bold;
-    padding-left: 10px;
+    padding-left: .4em;
 }
 .icon {
     position: fixed;
-    width: 20px;
-    right: 6px;
+    width: 1.3em;
+    right: .4em;
 }
-#info {
-    margin-bottom: 15px;
+#info, #url, #type {
+    margin-bottom: 1em;
+}
+.selecHeader {
+    margin-right: .5em;
+}
+.float {
+    margin: 0;
+    padding: 0;
+    float: right;
 }
 #textinput {
-    border: 0px;
+    margin: 0;
+    border: 0;
+}
+#select {
+    margin: 0;
+
 }
 input[type="button"] {
-    border: 0px;
+    float: right;
+    border: 0;
+    border-radius: .1em;
+    background-color: rgba(255, 255, 255, 1);
+}
+input[type="button"]:hover {
+    background-color: rgba(255, 255, 255, .8);
 }

@@ -4,6 +4,7 @@ window.onload = function () {
     this.document.getElementById('domainUrl').addEventListener('click', togChecked);
     this.document.getElementById('openShortcuts').addEventListener('click', openShortcuts);
     this.document.getElementById('activeTab').addEventListener('change', saveChange);
+    this.document.getElementById('reset').addEventListener('click', clear);
     chrome.runtime.onMessage.addListener(makeChange);
 }
 
@@ -19,6 +20,9 @@ function initialize () {
         appendUrls(reg.urlInfo, optStr, 'urls');
         for (let element of this.document.getElementsByClassName('selec')) {
             element.addEventListener('change', saveChange);
+        }
+        for (let element of this.document.getElementsByClassName('more')) {
+            element.addEventListener('click', setMenu);
         }
     });
 }
@@ -106,6 +110,56 @@ function saveChange (input) {
     });
 }
 
+function setMenu (input) {
+    var element = input.currentTarget;
+    var className = input.target.className;
+    chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
+        if (className == 'more'||className == 'dots') {
+            var cancel = makeElement('li', [{name: 'class', value: 'cancel'}], makeElement('div', [{name: 'class', value: 'cross'}]))[0];
+            var ul = makeElement('ul', [{name: 'class', value: 'menu'}], [cancel])[0];
+            for (let element of makeList(reg.config.menuList)) {
+                ul.append(element);
+            }
+            element.append(ul);
+        }
+        else if (className == 'cancel'||className == 'cross') {
+            element.querySelector('.menu').remove()
+        }
+        else if (className == 'delete') {
+            var re = /more[(](\S+)[)]/;
+            url = element.id.match(re)[1];
+            for (let index in reg.bbInfo.urls) {
+                if (reg.bbInfo.urls[index].url[0] == url) {
+                    var position = Number(index) + 2;
+                    console.log(position)
+                    document.querySelector('#bookmarks .objHeader li:nth-child(' + position + ')').remove()
+                    document.querySelector('#bookmarks .innerObj li:nth-child(' + position + ')').remove()
+                    reg.bbInfo.urls.splice(index, 1);
+                    break;
+                }
+            }
+            for (let index in reg.urlInfo.urls) {
+                if (reg.urlInfo.urls[index].url[0] == url) {
+                    var position = index + 2;
+                    document.querySelector('#urls .objHeader li:nth-child(' + position + ')').remove()
+                    document.querySelector('#urls .innerObj li:nth-child(' + position + ')').remove()
+                    reg.urlInfo.urls.splice(index, 1);
+                    break;
+                }
+            }
+            chrome.storage.local.set({bbInfo: reg.bbInfo, urlInfo: reg.urlInfo});
+        }
+    });
+}
+
+function clear () {
+    var msgArray = ['cfClear', 'bbClear', 'urlClear']
+    for (i in msgArray) {
+        chrome.runtime.sendMessage(msgArray[i]);
+    }
+    alert('Reset');
+}
+
 function makeChange (msg) {
     chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
         var optStr = getCurrent(reg)
@@ -114,7 +168,17 @@ function makeChange (msg) {
         }
         else if (msg == 'edited') {
             update(reg.bbInfo, optStr, 'bookmarks');
-            console.log('passing')
+        }
+        else if (msg == 'defCleared') {
+            document.getElementById('activeTab').setAttribute('checked', reg.config.focusNewTab);
+            document.querySelector('#openBBIn option[selected="true"]').removeAttribute('selected');
+            document.querySelector('#openBBIn option[value="' + reg.config.openBBIn + '"]').setAttribute('selected', true);
+            document.querySelector('#openBB option[selected="true"]').removeAttribute('selected');
+            document.querySelector('#openBB option[value="' + reg.config.openBB + '"]').setAttribute('selected', true);
+            document.querySelector('#openUrlIn option[selected="true"]').removeAttribute('selected');
+            document.querySelector('#openUrlIn option[value="' + reg.config.openUrlIn + '"]').setAttribute('selected', true);
+            document.querySelector('#openUrl option[selected="true"]').removeAttribute('selected');
+            document.querySelector('#openUrl option[value="' + reg.config.openUrl + '"]').setAttribute('selected', true);
         }
         console.log(msg);
     });
@@ -166,7 +230,7 @@ function makeElement(tag, attrs, childs, aTag, eAttr, eChild) {
 
 function makeOptions (optStr, isValue) {
     var elements = [];
-    optStr.value.forEach(function (item, index) {
+    optStr.value.forEach((item, index) => {
         let attrs = [];
         attrs.push({name: 'value', value: item});
         if (item == isValue) attrs.push({name: 'selected', value: true});
@@ -175,13 +239,21 @@ function makeOptions (optStr, isValue) {
     return elements;
 }
 
+function makeList (menuStr) {
+    var elements = [];
+    menuStr.value.forEach((item, index) => {
+        elements.push(makeElement('li', [{name: 'class', value: item}], [ menuStr.str[index] ])[0]);
+    });
+    return elements;
+}
+
 function appendUrls (info, optStr, domain) {
     for (let i of info.urls) {
-        let url = makeElement('div', [{name: 'class', value: 'url'}], 
-            [makeElement('div', [{name: 'class', value: 'more'}], [ makeElement('div', [{name: 'class', value: 'dots'}])[0] ])[0],
-            makeElement('span', [{name: 'class', value: 'selecHeader'}], [ i.url[0] ])[0] ], 1, false, true)[0];
+        let url = makeElement('li', [{name: 'class', value: 'url'}], 
+            [makeElement('div', [{name: 'class', value: 'more'}, {name: 'id', value: 'more(' + i.url[0] + ')'}], [ makeElement('div', [{name: 'class', value: 'dots'}])[0] ], 1, true)[0],
+            makeElement('span', [{name: 'class', value: 'selecHeader'}], [ i.url[0] ])[0] ], 1, true, true)[0];
         document.querySelector('#' + domain + ' .objHeader').append(url);
-        let indvSettings = makeElement('div', [{name: 'class', value: 'indvSettings'}],
+        let indvSettings = makeElement('li', [{name: 'class', value: 'indvSettings'}],
             [makeElement('div', [{name: 'class', value: 'sepLine'}])[0],
             makeElement('div', [{name: 'class', value: 'setting'}],
                 [makeElement('span', [{name: 'class', value: 'selecHeader'}], ['Open in a'])[0],

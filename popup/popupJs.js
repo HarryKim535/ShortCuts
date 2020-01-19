@@ -5,8 +5,6 @@ window.onload = function () {
     initialize ();
     this.document.getElementById('gear').onclick = goOptions;
     this.document.getElementById('submit').onclick = addUrl;
-    this.document.getElementById('init').onclick = togInit;
-    this.document.getElementById('reset').onclick = clear;
 }
 
 function initialize () {
@@ -27,7 +25,7 @@ function goOptions () {
 
 function addUrl (_, urlInput) {
 //Get URL information from Form
-    chrome.storage.local.get(['config', 'urlInfo'], function (reg) {
+    chrome.storage.local.get(['config', 'urlInfo', 'bbInfo'], function (reg) {
         if (!urlInput) {
             var re = new RegExp(reg.config.urlForm);
             var txt = document.getElementById('textInput').value;
@@ -47,16 +45,45 @@ function addUrl (_, urlInput) {
             var urlEval = urlInput;
         }
         if (urlEval === null) {
-            chrome.runtime.sendMessage('notUrl');
+            alert('Invalid URL')
             document.getElementById('textInput').value = "";
             placeUrl ();
             return;
         }
+        for (let url of reg.urlInfo.urls) {
+            if (url.url[0] == urlEval[0]) {
+                alert('URL already exist');
+                document.getElementById('textInput').value = "";
+                return;
+            }
+        }
+        for (let url of reg.bbInfo.urls) {
+            if (url.url[0] == urlEval[0]) {
+                alert('URL already exist');
+                document.getElementById('textInput').value = "";
+                return;
+            }
+        }
+        console.log(urlEval);
         var vOpen = document.getElementById('select').value;
+//reserved for new version
+        /* 
+        if (urlEval[1]) {
+            urlEval[0] = urlEval[4] + urlEval[5];
+            if (urlEval[3]) urlEval[0] = urlEval[3] + urlEval[0];
+            if (vOpen == 'every') urlEval[0] += '/';
+        }
+        else if (urlEval[10]) {
+            if (!urlEval[14]) urlEval[0] = urlEval[11] + urlEval[13];
+            else if (urlEval[14]&&!urlEval[15]) urlEval[0] = urlEval[11] + urlEval[13];
+            else if (urlEval[15]) urlEval[0] = urlEval[11] + urlEval[13] + urlEval[14] + urlEval[15];
+        }
+        */
 //Append new URL object to Array
         reg.urlInfo.urls[reg.urlInfo.urls.length] = {url: urlEval, open: vOpen, openIn: reg.config.openUrlIn, open: reg.config.openUrl, key: reg.urlInfo.urls.length};
         chrome.storage.local.set({urlInfo: reg.urlInfo}, function () {
             chrome.runtime.sendMessage('urlAdded');
+            alert('Saved')
         });
         document.getElementById('textInput').placeholder = "";
     });
@@ -70,28 +97,6 @@ function placeUrl () {
         chrome.tabs.query(reg.config.urlAttr, function (tabs) {
             var urlEval = tabs[0].url.match(re)
             document.getElementById('textInput').placeholder = urlEval[0];
-        });
-    });
-}
-
-//Send Clear message to background.js
-
-function clear () {
-    msgArray = ['cfClear', 'bbClear', 'urlClear']
-    for (i in msgArray) {
-        chrome.runtime.sendMessage(msgArray[i]);
-    }
-}
-
-function togInit () {
-    var checked = document.getElementById('init').checked;
-    chrome.storage.local.get(['config'], function (reg) {
-        if (checked) {
-            reg.config.init = true;
-        }
-        else if (!checked) reg.config.init = false;
-        chrome.storage.local.set({config : reg.config}, function () {
-            chrome.runtime.sendMessage('toggle');
         });
     });
 }
