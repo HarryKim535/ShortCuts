@@ -3,9 +3,8 @@
 function getBBInfo () {
     chrome.storage.local.get(['bbInfo', 'config'], reg => {
         chrome.bookmarks.getChildren(reg.config.folderId, bookmarks => {
-            var re = RegExp(reg.config.urlForm)
             for (i in bookmarks) {
-                reg.bbInfo.urls[i] = {url: bookmarks[i].url.match(re), openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
+                reg.bbInfo.urls[i] = {url: new URL(bookmarks[i].url), openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
             }
             chrome.storage.local.set({bbInfo: reg.bbInfo}, function () {
                 chrome.runtime.sendMessage('edited');
@@ -61,21 +60,20 @@ function checkMsg (msg) {
 
 function watchTabs (tab) {
     chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
-            console.log('read');
             reg.config.winAttr.tabId = tab.id;
             if (reg.config.focusNewTab) chrome.tabs.update(tab.id, {active: true});
-            var re = new RegExp(reg.config.urlForm);
-            var urlEval = tab.pendingUrl.match(re);
-            if (reg.bbInfo.urls) {
+            var url = new URL(tab.pendingUrl);
+            console.log(url)
+            /*if (reg.bbInfo.urls) {
                 for (i in reg.bbInfo.urls) {
-                    newWindow(reg.bbInfo.urls[i], urlEval[0], reg.config);
+                    newWindow(reg.bbInfo.urls[i], url, reg.config);
                 }
             }
             if (reg.urlInfo.urls) {
                 for (i in reg.urlInfo.urls) {
-                    newWindow(reg.urlInfo.urls[i], urlEval[0], reg.config);
+                    newWindow(reg.urlInfo.urls[i], url[0], reg.config);
                 }
-            }
+            }*/
     });
 }
 
@@ -159,30 +157,6 @@ function initialize () {
 
 function cfClear (bool) {
     var def = {
-            /*Retrun an array: [
-                0: result
-                1: http url
-                2: 'http[s]://'
-                3: 'www.'
-                4: prefix||host
-                5: host||suffix
-                6: '/'
-                7: path
-                8: '?'
-                9: '/$'
-                10: chrome url
-                11: chrome scheme
-                12: offline notion
-                13: host
-                14: '/'
-                15: path
-                16: '?'
-                17: '/$'
-                18: file url
-                19: ftp url
-                20: about url
-            ]*/
-        urlForm: '((https?://)?(www[.])?([A-Za-z0-9%\\-_]+[.])([A-Za-z0-9.%\\-_]+)(/)?([A-Za-z0-9./%\\-_]*)?([?])?(/$)?)|((chrome(-[a-z]+)?://)([a-z]+)(/)?([A-Za-z]*)([?])?(/$)?)|(file:///?\\S+)|(ftp://\\S+)|(about:\\w+)',
         urlAttr: {
             active: true,
             currentWindow: true
