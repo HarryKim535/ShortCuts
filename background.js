@@ -22,15 +22,14 @@ function setShortcuts (command) {
         var group = input[1];
         var index = input[2];
         if (group =='BM') {
-            reg.config.tabAttr.url = reg.bbInfo.urls[index].url[0];
+            reg.config.tabAttr.url = reg.bbInfo.urls[index].url.href;
             reg.config.tabAttr.active = reg.bbInfo.urls[index].isActive;
-            console.log(reg.config.tabAttr.url);
             chrome.tabs.create(reg.config.tabAttr);
         }
         else if (group == 'URL') {
             for (item in reg.urlInfo.urls) {
                 if (item.key == index) {
-                    reg.config.tabAttr.url = item.url[0];
+                    reg.config.tabAttr.url = item.url.href;
                     reg.config.tabAttr.active = item.active;
                     chrome.tabs.create(reg.config.tabAttr);
                 }
@@ -55,25 +54,11 @@ function checkMsg (msg) {
 
 //Open in a new window if so is it set
 
-/*-solved-!Got a infinite Recursive problem
-  Cannnot guerantee stability*/
-
 function watchTabs (tab) {
     chrome.storage.local.get(['config', 'bbInfo', 'urlInfo'], reg => {
             reg.config.winAttr.tabId = tab.id;
             if (reg.config.focusNewTab) chrome.tabs.update(tab.id, {active: true});
             var url = new URL(tab.pendingUrl);
-            console.log(url)
-            /*if (reg.bbInfo.urls) {
-                for (i in reg.bbInfo.urls) {
-                    newWindow(reg.bbInfo.urls[i], url, reg.config);
-                }
-            }
-            if (reg.urlInfo.urls) {
-                for (i in reg.urlInfo.urls) {
-                    newWindow(reg.urlInfo.urls[i], url[0], reg.config);
-                }
-            }*/
     });
 }
 
