@@ -43,7 +43,7 @@ function addUrl () {
             }
         }
         for (let url of reg.bbInfo.urls) {
-            if (url.url[0] == urlEval[0]) {
+            if (url.url == urlEval[0]) {
                 alert('URL already exist');
                 document.getElementById('textInput').value = "";
                 return;

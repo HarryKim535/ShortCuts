@@ -129,7 +129,7 @@ function setMenu (input) {
             var re = /more[(](\S+)[)]/;
             url = element.id.match(re)[1];
             for (let index in reg.bbInfo.urls) {
-                if (reg.bbInfo.urls[index].url[0] == url) {
+                if (reg.bbInfo.urls[index].url == url) {
                     var position = Number(index) + 2;
                     console.log(position)
                     document.querySelector('#bookmarks .objHeader li:nth-child(' + position + ')').remove()

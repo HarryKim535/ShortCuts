@@ -4,7 +4,7 @@ function getBBInfo () {
     chrome.storage.local.get(['bbInfo', 'config'], reg => {
         chrome.bookmarks.getChildren(reg.config.folderId, bookmarks => {
             for (i in bookmarks) {
-                reg.bbInfo.urls[i] = {url: new URL(bookmarks[i].url), openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
+                reg.bbInfo.urls[i] = {url: new URL(bookmarks[i].url).href, openIn: reg.config.openBBIn, open: reg.config.openBB, isActive: reg.config.tabAttr.active, key: i};
             }
             chrome.storage.local.set({bbInfo: reg.bbInfo}, function () {
                 chrome.runtime.sendMessage('edited');
@@ -22,7 +22,7 @@ function setShortcuts (command) {
         var group = input[1];
         var index = input[2];
         if (group =='BM') {
-            reg.config.tabAttr.url = reg.bbInfo.urls[index].url.href;
+            reg.config.tabAttr.url = reg.bbInfo.urls[index].url;
             reg.config.tabAttr.active = reg.bbInfo.urls[index].isActive;
             chrome.tabs.create(reg.config.tabAttr);
         }
@@ -90,7 +90,7 @@ function newWindow(item, urlEval, config) {
    "script-src 'self' blob: filesystem:*/
 
 function setListeners () {
-    chrome.runtime.onStartup.addListener(getBBInfo);
+    chrome.runtime.onInstalled.addListener(getBBInfo);
     chrome.runtime.onMessage.addListener(checkMsg);
     chrome.commands.onCommand.addListener(setShortcuts);
     chrome.bookmarks.onCreated.addListener(getBBInfo);
